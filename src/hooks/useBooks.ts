@@ -15,7 +15,6 @@ export const useBooks = () => {
     const [newBook, setNewBook] = useState<Book>(NewBook);
     const [bookToUpdate, setBookToUpdate] = useState<Book | null>(null);
     const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
-    console.log(books);
 
     useEffect(() => {
         getBooks();

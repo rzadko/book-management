@@ -49,6 +49,12 @@ export default async function handler(
             return res.status(400).json({ error: "Invalid id" });
         }
 
+        if (!title || !author) {
+            return res
+                .status(400)
+                .json({ error: "Title and author are required" });
+        }
+
         const updatedBook = await db.collection("books").updateOne(
             { _id: new ObjectId(_id) },
             {
