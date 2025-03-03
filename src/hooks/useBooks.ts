@@ -14,6 +14,8 @@ export const useBooks = () => {
     const [books, setBooks] = useState<Book[]>([]);
     const [newBook, setNewBook] = useState<Book>(NewBook);
     const [bookToUpdate, setBookToUpdate] = useState<Book | null>(null);
+    const [bookToDelete, setBookToDelete] = useState<Book | null>(null);
+    console.log(books);
 
     useEffect(() => {
         getBooks();
@@ -25,17 +27,23 @@ export const useBooks = () => {
             .then((data) => setBooks(data));
     };
 
-    const handleDeleteBook = async (id: string) => {
+    const handleDeleteBook = async (e: React.FormEvent) => {
+        e.preventDefault();
+
+        if (!bookToDelete) return;
+
         await fetch("/api/books", {
             method: "DELETE",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ id }),
+            body: JSON.stringify(bookToDelete),
         });
-        setBooks(books.filter((book: Book) => book._id !== id));
+
+        setBooks(books.filter((book: Book) => book._id !== bookToDelete._id));
     };
 
     const handleAddNewBook = async (e: React.FormEvent) => {
         e.preventDefault();
+
         await fetch("/api/books", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
@@ -45,11 +53,12 @@ export const useBooks = () => {
                 publishedDate: newBook.publishedDate,
             }),
         });
+
         setNewBook(NewBook);
         getBooks();
     };
 
-    const handleEditSubmit = async (e: React.FormEvent) => {
+    const handleChangeBook = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!bookToUpdate) return;
@@ -69,8 +78,10 @@ export const useBooks = () => {
         setNewBook,
         bookToUpdate,
         setBookToUpdate,
+        bookToDelete,
+        setBookToDelete,
         handleDeleteBook,
         handleAddNewBook,
-        handleEditSubmit,
+        handleChangeBook,
     };
 };

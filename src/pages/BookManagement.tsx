@@ -1,8 +1,9 @@
 "use client";
-import { BookForm } from "@/components/BookForm";
 import { BookTable } from "@/components/BookTable";
 import { Header } from "@/components/Header";
-import { Modal } from "@/components/Modal";
+import { ChangeModal } from "@/components/modals/ChangeModal";
+import { DeleteModal } from "@/components/modals/DeleteModal";
+import { NewModal } from "@/components/modals/NewModal";
 import { useBooks } from "@/hooks/useBooks";
 import { Book } from "@/types";
 import { useState } from "react";
@@ -14,79 +15,69 @@ export const BookManagement = () => {
         setNewBook,
         bookToUpdate,
         setBookToUpdate,
+        bookToDelete,
+        setBookToDelete,
         handleAddNewBook,
         handleDeleteBook,
-        handleEditSubmit,
+        handleChangeBook,
     } = useBooks();
 
-    const [openNewModal, setOpenNewModal] = useState<boolean>(false);
-    const [openChangeModal, setOpenChangeModal] = useState<boolean>(false);
+    const [toggleNewModal, setToggleNewModal] = useState<boolean>(false);
+    const [toggleChangeModal, setToggleChangeModal] = useState<boolean>(false);
+    const [toggleDeleteModal, setToggleDeleteModal] = useState<boolean>(false);
 
-    const handleOpenChangeModal = (book: Book) => {
+    const handleChangeModal = (book: Book) => {
         setBookToUpdate(book);
-        setOpenChangeModal(!openChangeModal);
+        setToggleChangeModal(!toggleChangeModal);
     };
 
-    const handleSubmitChangeModal = (e: React.FormEvent) => {
-        handleEditSubmit(e);
-        setOpenChangeModal(!openChangeModal);
-    };
-
-    const handleNewModal = (e: React.FormEvent) => {
-        handleAddNewBook(e);
-        setOpenNewModal(!openNewModal);
-    };
-
-    const NewBookModal = () => {
-        return (
-            <Modal
-                title="Add a new book"
-                isOpen={openNewModal}
-                setIsOpen={setOpenNewModal}
-            >
-                <BookForm
-                    book={newBook}
-                    setBook={setNewBook}
-                    handleSubmit={handleNewModal}
-                    submitText="Add book"
-                />
-            </Modal>
-        );
-    };
-
-    const ChangeBookModal = () => {
-        return (
-            <Modal
-                title="Edit book"
-                isOpen={openChangeModal}
-                setIsOpen={setOpenChangeModal}
-            >
-                <BookForm
-                    book={bookToUpdate!}
-                    setBook={setBookToUpdate}
-                    handleSubmit={handleSubmitChangeModal}
-                    submitText="Update book"
-                />
-            </Modal>
-        );
+    const handleDeleteModal = (book: Book) => {
+        setBookToDelete(book);
+        setToggleDeleteModal(!toggleDeleteModal);
     };
 
     return (
-        <div>
-            <Header
-                openModal={openNewModal}
-                setOpenModal={setOpenNewModal}
-            ></Header>
+        <>
+            {toggleNewModal && (
+                <NewModal
+                    toggle={toggleNewModal}
+                    setToggle={setToggleNewModal}
+                    newBook={newBook}
+                    setNewBook={setNewBook}
+                    handleAddNewBook={handleAddNewBook}
+                />
+            )}
+            {toggleChangeModal && (
+                <ChangeModal
+                    toggle={toggleChangeModal}
+                    setToggle={setToggleChangeModal}
+                    bookToUpdate={bookToUpdate!}
+                    setBookToUpdate={setBookToUpdate}
+                    handleChangeBook={handleChangeBook}
+                />
+            )}
+            {toggleDeleteModal && (
+                <DeleteModal
+                    bookToDelete={bookToDelete!}
+                    toggle={toggleDeleteModal}
+                    setToggle={setToggleDeleteModal}
+                    handleDeleteBook={handleDeleteBook}
+                />
+            )}
+            <div>
+                <Header
+                    toggle={toggleNewModal}
+                    setToggle={setToggleNewModal}
+                ></Header>
 
-            {openNewModal && NewBookModal()}
-            {openChangeModal && ChangeBookModal()}
-
-            <BookTable
-                books={books}
-                handleDeleteBook={handleDeleteBook}
-                handleChangeModal={handleOpenChangeModal}
-                isChangeModalOpen={openChangeModal}
-            ></BookTable>
-        </div>
+                <BookTable
+                    books={books}
+                    handleDeleteModal={handleDeleteModal}
+                    handleChangeModal={handleChangeModal}
+                    isChangeModalOpen={toggleChangeModal}
+                    isDeleteModalOpen={toggleDeleteModal}
+                ></BookTable>
+            </div>
+        </>
     );
 };
